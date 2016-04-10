@@ -1,11 +1,8 @@
 package zm.hashcode.hashdroidpvt.repository.settings;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
-
 import junit.framework.Assert;
 
-import org.testng.annotations.Test;
 
 import java.util.Set;
 
@@ -22,23 +19,27 @@ public class SettingsRepositoryTest  extends AndroidTestCase {
 
     public void testCreateReadUpdateDelete() throws Exception {
         SettingsRespository repo = new SettingsRespositoryImpl(this.getContext());
+        // CREATE
         Settings createEntity = new Settings.Builder()
-                .code("FDC")
+                .code("FDCD")
                 .password("test12")
-                .username("fcb@test.com")
+                .username("fc89b@test.com")
                 .build();
         Settings insertedEntity = repo.save(createEntity);
         id=insertedEntity.getId();
         Assert.assertNotNull(TAG+" CREATE",insertedEntity);
 
+        //READ ALL
         Set<Settings> settings = repo.findAll();
         Assert.assertTrue(TAG+" READ ALL",settings.size()>0);
 
+        //READ ENTITY
         Settings entity = repo.findById(id);
         Assert.assertNotNull(TAG+" READ ENTITY",entity);
 
 
 
+        //UPDATE ENTITY
         Settings updateEntity = new Settings.Builder()
                 .copy(entity)
                 .password("TEST47")
@@ -47,6 +48,7 @@ public class SettingsRepositoryTest  extends AndroidTestCase {
         Settings newEntity = repo.findById(id);
         Assert.assertEquals(TAG+ " UPDATE ENTITY","TEST47",newEntity.getPassword());
 
+        // DELETE ENTITY
         repo.delete(updateEntity);
         Settings deletedEntity = repo.findById(id);
         Assert.assertNull(TAG+" DELETE",deletedEntity);
