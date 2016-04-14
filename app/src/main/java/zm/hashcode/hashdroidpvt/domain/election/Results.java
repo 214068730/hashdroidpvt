@@ -18,6 +18,44 @@ public class Results implements Serializable {
 
     private Results(){}
 
+    public Long getId() {
+        return id;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public String getAgent() {
+        return agent;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public Map<String, Integer> getResults() {
+        return results;
+    }
+
+    public Results(Builder builder) {
+        this.agent = builder.agent;
+        this.date = builder.date;
+        this.id = builder.id;
+        this.image = builder.image;
+        this.location = builder.location;
+        this.status = builder.status;
+        this.results = builder.results;
+    }
+
     public static class Builder{
         private Long id;
         private Map<String,Integer> results;
@@ -65,8 +103,33 @@ public class Results implements Serializable {
         public Builder copy(Results value){
             this.id=value.id;
             this.agent = value.agent;
+            this.results = value.results;
+            this.date = value.date;
+            this.image = value.image;
+            this.location = value.location;
+            this.status = value.status;
             return this;
         }
 
+        public Results build(){
+            return new Results(this);
+        }
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Results results = (Results) o;
+
+        return id.equals(results.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

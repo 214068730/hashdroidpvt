@@ -7,5 +7,7 @@ public enum DomainState {
     ACTIVE,
     RETIRED,
     WITH_ADMIN,
-    NO_ADMIN
+    NO_ADMIN,
+    UPLOADED,
+    NOTUPLOADED
 }
