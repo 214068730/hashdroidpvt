@@ -1,4 +1,4 @@
-package zm.hashcode.hashdroidpvt.respository.settings.Impl;
+package zm.hashcode.hashdroidpvt.respository.election.Impl;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,14 +13,22 @@ import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
 import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRespository;
+import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
 
 /**
- * Created by hashcode on 2016/04/09.
+ * Created by hashcode on 2016/04/16.
  */
-public class SettingsRespositoryImpl extends SQLiteOpenHelper implements SettingsRespository {
+public class CandidateRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
     public static final String TABLE_SETTINGS = "settings";
     private SQLiteDatabase db;
+
+    private Long id;
+    private String candidateId;
+    private String firstname;
+    private String lastName;
+    private byte[] candidateImage;
+    private byte[] symbolImage;
+    private String electionTypeId;
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_CODE = "code";
@@ -36,7 +44,7 @@ public class SettingsRespositoryImpl extends SQLiteOpenHelper implements Setting
             + COLUMN_PASSWORD + " TEXT NOT NULL );";
 
 
-    public SettingsRespositoryImpl(Context context) {
+    public CandidateRepositoryImpl(Context context) {
         super(context, DBConstants.DATABASE_NAME, null, DBConstants.DATABASE_VERSION);
     }
 

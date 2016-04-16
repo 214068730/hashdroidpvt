@@ -32,6 +32,7 @@ public class ActivateActivity extends AppCompatActivity {
                 Log.d("PASS",password.getText().toString());
                 Log.d("CODE",orgcode.getText().toString());
 
+
             }
         });
 

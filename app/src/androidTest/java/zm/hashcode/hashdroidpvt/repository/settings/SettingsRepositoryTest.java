@@ -7,8 +7,8 @@ import junit.framework.Assert;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.Impl.SettingsRespositoryImpl;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRespository;
+import zm.hashcode.hashdroidpvt.respository.settings.Impl.SettingsRepositoryImpl;
+import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
 
 /**
  * Created by hashcode on 2016/04/09.
@@ -18,7 +18,7 @@ public class SettingsRepositoryTest  extends AndroidTestCase {
     private Long id;
 
     public void testCreateReadUpdateDelete() throws Exception {
-        SettingsRespository repo = new SettingsRespositoryImpl(this.getContext());
+        SettingsRepository repo = new SettingsRepositoryImpl(this.getContext());
         // CREATE
         Settings createEntity = new Settings.Builder()
                 .code("FDCD")

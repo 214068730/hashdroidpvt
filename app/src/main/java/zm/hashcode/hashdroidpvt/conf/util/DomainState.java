@@ -11,5 +11,7 @@ public enum DomainState {
     UPLOADED,
     NOTUPLOADED,
     SUCCEEDED,
-    FAILED
+    FAILED,
+    ACTIVATED,
+    NOTACTIVATED
 }
