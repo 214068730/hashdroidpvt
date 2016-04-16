@@ -16,4 +16,6 @@ public interface Repository<E, ID> {
     E delete(E entity);
 
     Set<E> findAll();
+
+    int deleteAll();
 }

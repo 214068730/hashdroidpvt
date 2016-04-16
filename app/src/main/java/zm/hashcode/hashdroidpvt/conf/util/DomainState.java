@@ -9,5 +9,7 @@ public enum DomainState {
     WITH_ADMIN,
     NO_ADMIN,
     UPLOADED,
-    NOTUPLOADED
+    NOTUPLOADED,
+    SUCCEEDED,
+    FAILED
 }

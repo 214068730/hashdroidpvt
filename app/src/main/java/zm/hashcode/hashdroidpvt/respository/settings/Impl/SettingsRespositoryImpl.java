@@ -67,10 +67,10 @@ public class SettingsRespositoryImpl extends SQLiteOpenHelper implements Setting
                 null);
         if (cursor.moveToFirst()) {
             final Settings settings = new Settings.Builder()
-                    .id(cursor.getLong(0))
-                    .code(cursor.getString(1))
-                    .username(cursor.getString(2))
-                    .password(cursor.getString(3))
+                    .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
+                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
+                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
+                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
                     .build();
 
             return settings;
@@ -125,29 +125,34 @@ public class SettingsRespositoryImpl extends SQLiteOpenHelper implements Setting
     @Override
     public Set<Settings> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectAll = " SELECT * FROM " + TABLE_SETTINGS;
         Set<Settings> settings = new HashSet<>();
         open();
-        Cursor cursor = db.rawQuery(selectAll, null);
+        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
                 final Settings setting = new Settings.Builder()
-                        .id(cursor.getLong(0))
-                        .code(cursor.getString(1))
-                        .username(cursor.getString(2))
-                        .password(cursor.getString(3))
+                        .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
+                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
+                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
+                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
                         .build();
                 settings.add(setting);
             } while (cursor.moveToNext());
         }
-
         return settings;
+    }
+
+    @Override
+    public int deleteAll() {
+        open();
+        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        close();
+        return rowsDeleted;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(DATABASE_CREATE);
-
     }
 
     @Override
