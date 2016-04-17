@@ -12,32 +12,29 @@ import java.util.HashSet;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
-import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.domain.election.Elections;
+import zm.hashcode.hashdroidpvt.respository.election.ElectionsRepository;
 
 /**
  * Created by hashcode on 2016/04/16.
  */
-public class ElectionsRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+public class ElectionsRepositoryImpl extends SQLiteOpenHelper implements ElectionsRepository {
+    public static final String TABLE_NAME = "elections";
     private SQLiteDatabase db;
 
-    private Long id;
-    private String electionTypeId;
-    private String name;
+
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CODE = "code";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "passwd";
+    public static final String COLUMN_ELECTIONTYPEID = "electionTypeId";
+    public static final String COLUMN_NAME = "name";
+
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_PASSWORD + " TEXT NOT NULL );";
+            + COLUMN_ELECTIONTYPEID + " TEXT UNIQUE NOT NULL , "
+            + COLUMN_NAME + " TEXT NOT NULL );";
 
 
     public ElectionsRepositoryImpl(Context context) {
@@ -53,16 +50,15 @@ public class ElectionsRepositoryImpl extends SQLiteOpenHelper implements Setting
     }
 
     @Override
-    public Settings findById(Long id) {
+    public Elections findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
-                        COLUMN_CODE,
-                        COLUMN_USERNAME,
-                        COLUMN_PASSWORD},
+                        COLUMN_ELECTIONTYPEID,
+                        COLUMN_NAME},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -70,29 +66,26 @@ public class ElectionsRepositoryImpl extends SQLiteOpenHelper implements Setting
                 null,
                 null);
         if (cursor.moveToFirst()) {
-            final Settings settings = new Settings.Builder()
+            final Elections elections = new Elections.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                    .electionTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ELECTIONTYPEID)))
+                    .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
                     .build();
-
-            return settings;
+            return elections;
         } else {
             return null;
         }
     }
 
     @Override
-    public Settings save(Settings entity) {
+    public Elections save(Elections entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
-        Settings insertedEntity = new Settings.Builder()
+        values.put(COLUMN_ELECTIONTYPEID, entity.getElectionTypeId());
+        values.put(COLUMN_NAME, entity.getName());
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
+        Elections insertedEntity = new Elections.Builder()
                 .copy(entity)
                 .id(new Long(id))
                 .build();
@@ -100,15 +93,14 @@ public class ElectionsRepositoryImpl extends SQLiteOpenHelper implements Setting
     }
 
     @Override
-    public Settings update(Settings entity) {
+    public Elections update(Elections entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
+        values.put(COLUMN_ELECTIONTYPEID, entity.getElectionTypeId());
+        values.put(COLUMN_NAME, entity.getName());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -117,39 +109,38 @@ public class ElectionsRepositoryImpl extends SQLiteOpenHelper implements Setting
     }
 
     @Override
-    public Settings delete(Settings entity) {
+    public Elections delete(Elections entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
     }
 
     @Override
-    public Set<Settings> findAll() {
+    public Set<Elections> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Set<Settings> settings = new HashSet<>();
+        Set<Elections> elections = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
-                final Settings setting = new Settings.Builder()
+                final Elections election = new Elections.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                        .electionTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ELECTIONTYPEID)))
+                        .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
                         .build();
-                settings.add(setting);
+                elections.add(election);
             } while (cursor.moveToNext());
         }
-        return settings;
+        return elections;
     }
 
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
     }
@@ -164,7 +155,7 @@ public class ElectionsRepositoryImpl extends SQLiteOpenHelper implements Setting
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }

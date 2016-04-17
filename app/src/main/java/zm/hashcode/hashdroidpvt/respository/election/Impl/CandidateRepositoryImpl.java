@@ -12,36 +12,35 @@ import java.util.HashSet;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
-import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.domain.election.Candidate;
+import zm.hashcode.hashdroidpvt.respository.election.CandidateRepository;
+
 
 /**
  * Created by hashcode on 2016/04/16.
  */
-public class CandidateRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+public class CandidateRepositoryImpl extends SQLiteOpenHelper implements CandidateRepository {
+    public static final String TABLE_NAME = "candidate";
     private SQLiteDatabase db;
 
-    private Long id;
-    private String candidateId;
-    private String firstname;
-    private String lastName;
-    private byte[] candidateImage;
-    private byte[] symbolImage;
-    private String electionTypeId;
-
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CODE = "code";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "passwd";
+    public static final String COLUMN_CANDIDATEID = "candidateId";
+    public static final String COLUMN_FIRSTNAME = "firstname";
+    public static final String COLUMN_LASTNAME = "lastName";
+    public static final String COLUMN_CANDIDATEIMAGE = "candidateImage";
+    public static final String COLUMN_SYMBOLIMAGE = "symbolImage";
+    public static final String COLUMN_ELECTIONTYPEID = "electionTypeId";
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_PASSWORD + " TEXT NOT NULL );";
+            + COLUMN_CANDIDATEID + " TEXT UNIQUE NOT NULL , "
+            + COLUMN_FIRSTNAME + " TEXT NOT NULL , "
+            + COLUMN_LASTNAME + " TEXT NOT NULL , "
+            + COLUMN_CANDIDATEIMAGE + " BLOB , "
+            + COLUMN_SYMBOLIMAGE + " BLOB , "
+            + COLUMN_ELECTIONTYPEID + " TEXT NOT NULL );";
 
 
     public CandidateRepositoryImpl(Context context) {
@@ -57,16 +56,19 @@ public class CandidateRepositoryImpl extends SQLiteOpenHelper implements Setting
     }
 
     @Override
-    public Settings findById(Long id) {
+    public Candidate findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
-                        COLUMN_CODE,
-                        COLUMN_USERNAME,
-                        COLUMN_PASSWORD},
+                        COLUMN_CANDIDATEID,
+                        COLUMN_FIRSTNAME,
+                        COLUMN_LASTNAME,
+                        COLUMN_CANDIDATEIMAGE,
+                        COLUMN_SYMBOLIMAGE,
+                        COLUMN_ELECTIONTYPEID},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -74,29 +76,35 @@ public class CandidateRepositoryImpl extends SQLiteOpenHelper implements Setting
                 null,
                 null);
         if (cursor.moveToFirst()) {
-            final Settings settings = new Settings.Builder()
+            final Candidate candidate = new Candidate.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                    .symbolImage(cursor.getBlob(cursor.getColumnIndex(COLUMN_SYMBOLIMAGE)))
+                    .firstname(cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME)))
+                    .lastName(cursor.getString(cursor.getColumnIndex(COLUMN_LASTNAME)))
+                    .candidateImage(cursor.getBlob(cursor.getColumnIndex(COLUMN_CANDIDATEIMAGE)))
+                    .candidateId(cursor.getString(cursor.getColumnIndex(COLUMN_CANDIDATEID)))
+                    .electionTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ELECTIONTYPEID)))
                     .build();
 
-            return settings;
+            return candidate;
         } else {
             return null;
         }
     }
 
     @Override
-    public Settings save(Settings entity) {
+    public Candidate save(Candidate entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
-        Settings insertedEntity = new Settings.Builder()
+        values.put(COLUMN_CANDIDATEID, entity.getCandidateId());
+        values.put(COLUMN_FIRSTNAME, entity.getFirstname());
+        values.put(COLUMN_LASTNAME, entity.getLastName());
+        values.put(COLUMN_CANDIDATEIMAGE, entity.getCandidateImage());
+        values.put(COLUMN_SYMBOLIMAGE, entity.getSymbolImage());
+        values.put(COLUMN_ELECTIONTYPEID, entity.getElectionTypeId());
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
+        Candidate insertedEntity = new Candidate.Builder()
                 .copy(entity)
                 .id(new Long(id))
                 .build();
@@ -104,15 +112,18 @@ public class CandidateRepositoryImpl extends SQLiteOpenHelper implements Setting
     }
 
     @Override
-    public Settings update(Settings entity) {
+    public Candidate update(Candidate entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
+        values.put(COLUMN_CANDIDATEID, entity.getCandidateId());
+        values.put(COLUMN_FIRSTNAME, entity.getFirstname());
+        values.put(COLUMN_LASTNAME, entity.getLastName());
+        values.put(COLUMN_CANDIDATEIMAGE, entity.getCandidateImage());
+        values.put(COLUMN_SYMBOLIMAGE, entity.getSymbolImage());
+        values.put(COLUMN_ELECTIONTYPEID, entity.getElectionTypeId());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -121,39 +132,42 @@ public class CandidateRepositoryImpl extends SQLiteOpenHelper implements Setting
     }
 
     @Override
-    public Settings delete(Settings entity) {
+    public Candidate delete(Candidate entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
     }
 
     @Override
-    public Set<Settings> findAll() {
+    public Set<Candidate> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Set<Settings> settings = new HashSet<>();
+        Set<Candidate> candidates = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
-                final Settings setting = new Settings.Builder()
+                final Candidate candidate = new Candidate.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                        .symbolImage(cursor.getBlob(cursor.getColumnIndex(COLUMN_SYMBOLIMAGE)))
+                        .firstname(cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME)))
+                        .lastName(cursor.getString(cursor.getColumnIndex(COLUMN_LASTNAME)))
+                        .candidateImage(cursor.getBlob(cursor.getColumnIndex(COLUMN_CANDIDATEIMAGE)))
+                        .candidateId(cursor.getString(cursor.getColumnIndex(COLUMN_CANDIDATEID)))
+                        .electionTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ELECTIONTYPEID)))
                         .build();
-                settings.add(setting);
+                candidates.add(candidate);
             } while (cursor.moveToNext());
         }
-        return settings;
+        return candidates;
     }
 
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
     }
@@ -168,7 +182,7 @@ public class CandidateRepositoryImpl extends SQLiteOpenHelper implements Setting
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }

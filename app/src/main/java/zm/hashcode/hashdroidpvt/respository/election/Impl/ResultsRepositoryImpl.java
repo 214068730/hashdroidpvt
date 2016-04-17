@@ -8,20 +8,26 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
-import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.domain.election.Results;
+import zm.hashcode.hashdroidpvt.respository.election.ResultsRepository;
 
 /**
  * Created by hashcode on 2016/04/16.
  */
-public class ResultsRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+public class ResultsRepositoryImpl extends SQLiteOpenHelper implements ResultsRepository {
+    public static final String TABLE_NAME = "results";
     private SQLiteDatabase db;
 
     private Long id;
@@ -34,17 +40,23 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements SettingsR
 
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CODE = "code";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "passwd";
+    public static final String COLUMN_RESULTS = "results";
+    public static final String COLUMN_LOCATION = "location";
+    public static final String COLUMN_AGENT = "agent";
+    public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_IMAGE = "image";
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_PASSWORD + " TEXT NOT NULL );";
+            + COLUMN_RESULTS + " TEXT  NOT NULL , "
+            + COLUMN_LOCATION + " TEXT  NOT NULL , "
+            + COLUMN_DATE + " DATE  NOT NULL , "
+            + COLUMN_STATUS + " TEXT  NOT NULL , "
+            + COLUMN_AGENT + " TEXT  NOT NULL , "
+            + COLUMN_IMAGE + " BLOB );";
 
 
     public ResultsRepositoryImpl(Context context) {
@@ -60,16 +72,19 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements SettingsR
     }
 
     @Override
-    public Settings findById(Long id) {
+    public Results findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
-                        COLUMN_CODE,
-                        COLUMN_USERNAME,
-                        COLUMN_PASSWORD},
+                        COLUMN_RESULTS,
+                        COLUMN_LOCATION,
+                        COLUMN_DATE,
+                        COLUMN_STATUS,
+                        COLUMN_AGENT,
+                        COLUMN_IMAGE},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -77,29 +92,58 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements SettingsR
                 null,
                 null);
         if (cursor.moveToFirst()) {
-            final Settings settings = new Settings.Builder()
+            final Results Results = new Results.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                    .results(getValue(cursor.getString(cursor.getColumnIndex(COLUMN_RESULTS))))
+                    .agent(cursor.getString(cursor.getColumnIndex(COLUMN_AGENT)))
+                    .date(getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                    .image(cursor.getBlob(cursor.getColumnIndex(COLUMN_IMAGE)))
+                    .location(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION)))
+                    .statusx(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
                     .build();
 
-            return settings;
+            return Results;
         } else {
             return null;
         }
     }
 
+    private Date getDate(String date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+        Date value = null;
+        try {
+            value = formatter.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
+
+    private Map<String, Integer> getValue(String value) {
+        final Gson gson = new Gson();
+        Type typeOfHashMap = new TypeToken<Map<String, Integer>>() {
+        }.getType();
+        return gson.fromJson(value, typeOfHashMap);
+    }
+
+    private String getStringValue(Map<String, Integer> value) {
+        Gson gson = new Gson();
+        return gson.toJson(value);
+    }
+
     @Override
-    public Settings save(Settings entity) {
+    public Results save(Results entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
-        Settings insertedEntity = new Settings.Builder()
+        values.put(COLUMN_AGENT, entity.getAgent());
+        values.put(COLUMN_DATE, entity.getDate().toString());
+        values.put(COLUMN_IMAGE, entity.getImage());
+        values.put(COLUMN_LOCATION, entity.getLocation());
+        values.put(COLUMN_RESULTS, getStringValue(entity.getResults()));
+        values.put(COLUMN_STATUS, entity.getStatus());
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
+        Results insertedEntity = new Results.Builder()
                 .copy(entity)
                 .id(new Long(id))
                 .build();
@@ -107,15 +151,19 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements SettingsR
     }
 
     @Override
-    public Settings update(Settings entity) {
+    public Results update(Results entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
+        values.put(COLUMN_ID, entity.getId());
+        values.put(COLUMN_AGENT, entity.getAgent());
+        values.put(COLUMN_DATE, entity.getDate().toString());
+        values.put(COLUMN_IMAGE, entity.getImage());
+        values.put(COLUMN_LOCATION, entity.getLocation());
+        values.put(COLUMN_RESULTS, getStringValue(entity.getResults()));
+        values.put(COLUMN_STATUS, entity.getStatus());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -124,39 +172,42 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements SettingsR
     }
 
     @Override
-    public Settings delete(Settings entity) {
+    public Results delete(Results entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
     }
 
     @Override
-    public Set<Settings> findAll() {
+    public Set<Results> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Set<Settings> settings = new HashSet<>();
+        Set<Results> results = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
-                final Settings setting = new Settings.Builder()
+                final Results result = new Results.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                        .results(getValue(cursor.getString(cursor.getColumnIndex(COLUMN_RESULTS))))
+                        .agent(cursor.getString(cursor.getColumnIndex(COLUMN_AGENT)))
+                        .date(getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                        .image(cursor.getBlob(cursor.getColumnIndex(COLUMN_IMAGE)))
+                        .location(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION)))
+                        .statusx(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
                         .build();
-                settings.add(setting);
+                results.add(result);
             } while (cursor.moveToNext());
         }
-        return settings;
+        return results;
     }
 
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
     }
@@ -171,7 +222,7 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements SettingsR
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }

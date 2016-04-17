@@ -8,37 +8,44 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
-import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.domain.election.PollingStation;
+import zm.hashcode.hashdroidpvt.respository.election.PollingStationRepository;
+
 
 /**
  * Created by hashcode on 2016/04/16.
  */
-public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements PollingStationRepository {
+    public static final String TABLE_NAME = "station";
     private SQLiteDatabase db;
+
     private Long id;
     private String name;
     private int voters;
-    private Map<String,String> location;
+    private Map<String, String> location;
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CODE = "code";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "passwd";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_VOTERS = "voters";
+    public static final String COLUMN_LOCATION = "location";
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_PASSWORD + " TEXT NOT NULL );";
+            + COLUMN_NAME + " TEXT  NOT NULL , "
+            + COLUMN_VOTERS + " INTEGER  NOT NULL , "
+            + COLUMN_LOCATION + " TEXT NOT NULL );";
 
 
     public PollingStationRepositoryImpl(Context context) {
@@ -54,16 +61,16 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Se
     }
 
     @Override
-    public Settings findById(Long id) {
+    public PollingStation findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
-                        COLUMN_CODE,
-                        COLUMN_USERNAME,
-                        COLUMN_PASSWORD},
+                        COLUMN_NAME,
+                        COLUMN_VOTERS,
+                        COLUMN_LOCATION},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -71,45 +78,57 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Se
                 null,
                 null);
         if (cursor.moveToFirst()) {
-            final Settings settings = new Settings.Builder()
+            final PollingStation PollingStation = new PollingStation.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                    .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
+                    .voters(cursor.getInt(cursor.getColumnIndex(COLUMN_VOTERS)))
+                    .location(getLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION))))
                     .build();
 
-            return settings;
+            return PollingStation;
         } else {
             return null;
         }
     }
 
+    private Map<String, String> getLocation(String value) {
+        final Gson gson = new Gson();
+        Type typeOfHashMap = new TypeToken<Map<String, String>>() {
+        }.getType();
+        return gson.fromJson(value, typeOfHashMap);
+    }
+
     @Override
-    public Settings save(Settings entity) {
+    public PollingStation save(PollingStation entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
-        Settings insertedEntity = new Settings.Builder()
+        values.put(COLUMN_LOCATION, getStringLocation(entity.getLocation()));
+        values.put(COLUMN_NAME, entity.getName());
+        values.put(COLUMN_VOTERS, entity.getVoters());
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
+        PollingStation insertedEntity = new PollingStation.Builder()
                 .copy(entity)
                 .id(new Long(id))
                 .build();
         return insertedEntity;
     }
 
+    private String getStringLocation(Map<String, String> location) {
+        Gson gson = new Gson();
+        return gson.toJson(location);
+    }
+
     @Override
-    public Settings update(Settings entity) {
+    public PollingStation update(PollingStation entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
+        values.put(COLUMN_LOCATION, getStringLocation(entity.getLocation()));
+        values.put(COLUMN_NAME, entity.getName());
+        values.put(COLUMN_VOTERS, entity.getVoters());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -118,39 +137,39 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Se
     }
 
     @Override
-    public Settings delete(Settings entity) {
+    public PollingStation delete(PollingStation entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
     }
 
     @Override
-    public Set<Settings> findAll() {
+    public Set<PollingStation> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Set<Settings> settings = new HashSet<>();
+        Set<PollingStation> pollingStations = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
-                final Settings setting = new Settings.Builder()
+                final PollingStation pollingStation = new PollingStation.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                        .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
+                        .voters(cursor.getInt(cursor.getColumnIndex(COLUMN_VOTERS)))
+                        .location(getLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION))))
                         .build();
-                settings.add(setting);
+                pollingStations.add(pollingStation);
             } while (cursor.moveToNext());
         }
-        return settings;
+        return pollingStations;
     }
 
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME, null, null);
         close();
         return rowsDeleted;
     }
@@ -165,7 +184,7 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Se
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }

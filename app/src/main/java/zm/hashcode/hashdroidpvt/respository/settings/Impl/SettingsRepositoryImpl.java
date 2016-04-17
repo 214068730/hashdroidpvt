@@ -19,7 +19,7 @@ import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
  * Created by hashcode on 2016/04/09.
  */
 public class SettingsRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+    public static final String TABLE_NAME = "settings";
     private SQLiteDatabase db;
 
     public static final String COLUMN_ID = "id";
@@ -29,7 +29,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
             + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
@@ -53,7 +53,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
                         COLUMN_CODE,
@@ -87,7 +87,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
         values.put(COLUMN_CODE, entity.getCode());
         values.put(COLUMN_USERNAME, entity.getUsername());
         values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
         Settings insertedEntity = new Settings.Builder()
                 .copy(entity)
                 .id(new Long(id))
@@ -104,7 +104,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
         values.put(COLUMN_USERNAME, entity.getUsername());
         values.put(COLUMN_PASSWORD, entity.getPassword());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -116,7 +116,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
     public Settings delete(Settings entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
@@ -127,7 +127,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
         SQLiteDatabase db = this.getReadableDatabase();
         Set<Settings> settings = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
                 final Settings setting = new Settings.Builder()
@@ -145,7 +145,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
     }
@@ -160,7 +160,7 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }
