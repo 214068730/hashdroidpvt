@@ -12,14 +12,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
-import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.domain.settings.Gender;
+import zm.hashcode.hashdroidpvt.respository.settings.GenderRepository;
 
 /**
  * Created by hashcode on 2016/04/16.
  */
-public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements GenderRepository {
+    public static final String TABLE_NAME = "gendertype";
     private SQLiteDatabase db;
 
     private String id;
@@ -27,17 +27,16 @@ public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements Settin
     private String state;
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CODE = "code";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "passwd";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_STATE = "state";
+
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_PASSWORD + " TEXT NOT NULL );";
+            + COLUMN_NAME + " TEXT  NOT NULL , "
+            + COLUMN_STATE + " TEXT NOT NULL );";
 
 
     public GenderTypeRepositoryImpl(Context context) {
@@ -53,16 +52,15 @@ public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements Settin
     }
 
     @Override
-    public Settings findById(Long id) {
+    public Gender findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
-                        COLUMN_CODE,
-                        COLUMN_USERNAME,
-                        COLUMN_PASSWORD},
+                        COLUMN_NAME,
+                        COLUMN_STATE},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -70,29 +68,27 @@ public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements Settin
                 null,
                 null);
         if (cursor.moveToFirst()) {
-            final Settings settings = new Settings.Builder()
+            final Gender gender = new Gender.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                    .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
+                    .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
                     .build();
 
-            return settings;
+            return gender;
         } else {
             return null;
         }
     }
 
     @Override
-    public Settings save(Settings entity) {
+    public Gender save(Gender entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
-        Settings insertedEntity = new Settings.Builder()
+        values.put(COLUMN_NAME, entity.getName());
+        values.put(COLUMN_STATE, entity.getName());
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
+        Gender insertedEntity = new Gender.Builder()
                 .copy(entity)
                 .id(new Long(id))
                 .build();
@@ -100,15 +96,14 @@ public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements Settin
     }
 
     @Override
-    public Settings update(Settings entity) {
+    public Gender update(Gender entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
+        values.put(COLUMN_NAME, entity.getName());
+        values.put(COLUMN_STATE, entity.getState());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -117,39 +112,38 @@ public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements Settin
     }
 
     @Override
-    public Settings delete(Settings entity) {
+    public Gender delete(Gender entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
     }
 
     @Override
-    public Set<Settings> findAll() {
+    public Set<Gender> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Set<Settings> settings = new HashSet<>();
+        Set<Gender> genders = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
-                final Settings setting = new Settings.Builder()
+                final Gender gender = new Gender.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                        .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
+                        .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
                         .build();
-                settings.add(setting);
+                genders.add(gender);
             } while (cursor.moveToNext());
         }
-        return settings;
+        return genders;
     }
 
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
     }
@@ -164,7 +158,7 @@ public class GenderTypeRepositoryImpl extends SQLiteOpenHelper implements Settin
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }

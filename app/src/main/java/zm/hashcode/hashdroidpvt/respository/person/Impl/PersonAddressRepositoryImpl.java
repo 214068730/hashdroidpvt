@@ -8,41 +8,40 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
-import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.conf.util.AppUtil;
+import zm.hashcode.hashdroidpvt.domain.person.PersonAddress;
+import zm.hashcode.hashdroidpvt.respository.person.PersonAddressRepository;
 
 /**
  * Created by hashcode on 2016/04/16.
  */
-public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements PersonAddressRepository {
+    public static final String TABLE_NAME = "paddress";
     private SQLiteDatabase db;
 
-    private Long id;
-    private String description;
-    private String postalCode;
-    private String addressTypeId;
-    private String status;
-    private Date date;
-    private String state;
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CODE = "code";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "passwd";
+    public static final String COLUMN_DESCRIPTION = "description";
+    public static final String COLUMN_POSTALCODE = "postalCode";
+    public static final String COLUMN_ADDRESSTYPE = "addressTypeId";
+    public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_STATE = "state";
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_PASSWORD + " TEXT NOT NULL );";
+            + COLUMN_DESCRIPTION + " TEXT NOT NULL , "
+            + COLUMN_POSTALCODE + " TEXT NOT NULL , "
+            + COLUMN_ADDRESSTYPE + " TEXT  NOT NULL , "
+            + COLUMN_STATUS + " TEXT  NOT NULL , "
+            + COLUMN_DATE + " TEXT  NOT NULL , "
+            + COLUMN_STATE + " TEXT NOT NULL );";
 
 
     public PersonAddressRepositoryImpl(Context context) {
@@ -58,16 +57,19 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Set
     }
 
     @Override
-    public Settings findById(Long id) {
+    public PersonAddress findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
-                        COLUMN_CODE,
-                        COLUMN_USERNAME,
-                        COLUMN_PASSWORD},
+                        COLUMN_DESCRIPTION,
+                        COLUMN_POSTALCODE,
+                        COLUMN_ADDRESSTYPE,
+                        COLUMN_STATUS,
+                        COLUMN_DATE,
+                        COLUMN_STATE},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -75,29 +77,35 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Set
                 null,
                 null);
         if (cursor.moveToFirst()) {
-            final Settings settings = new Settings.Builder()
+            final PersonAddress personalAddress = new PersonAddress.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                    .addressTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ADDRESSTYPE)))
+                    .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                    .description(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)))
+                    .status(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
+                    .postalCode(cursor.getString(cursor.getColumnIndex(COLUMN_POSTALCODE)))
+                    .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
                     .build();
 
-            return settings;
+            return personalAddress;
         } else {
             return null;
         }
     }
 
     @Override
-    public Settings save(Settings entity) {
+    public PersonAddress save(PersonAddress entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
-        Settings insertedEntity = new Settings.Builder()
+        values.put(COLUMN_ADDRESSTYPE, entity.getAddressTypeId());
+        values.put(COLUMN_DATE, entity.getDate().toString());
+        values.put(COLUMN_DESCRIPTION, entity.getDescription());
+        values.put(COLUMN_POSTALCODE, entity.getPostalCode());
+        values.put(COLUMN_STATE, entity.getState());
+        values.put(COLUMN_STATUS, entity.getStatus());
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
+        PersonAddress insertedEntity = new PersonAddress.Builder()
                 .copy(entity)
                 .id(new Long(id))
                 .build();
@@ -105,15 +113,18 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Set
     }
 
     @Override
-    public Settings update(Settings entity) {
+    public PersonAddress update(PersonAddress entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
+        values.put(COLUMN_ADDRESSTYPE, entity.getAddressTypeId());
+        values.put(COLUMN_DATE, entity.getDate().toString());
+        values.put(COLUMN_DESCRIPTION, entity.getDescription());
+        values.put(COLUMN_POSTALCODE, entity.getPostalCode());
+        values.put(COLUMN_STATE, entity.getState());
+        values.put(COLUMN_STATUS, entity.getStatus());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -122,39 +133,42 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Set
     }
 
     @Override
-    public Settings delete(Settings entity) {
+    public PersonAddress delete(PersonAddress entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
     }
 
     @Override
-    public Set<Settings> findAll() {
+    public Set<PersonAddress> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Set<Settings> settings = new HashSet<>();
+        Set<PersonAddress> personAddresses = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
-                final Settings setting = new Settings.Builder()
+                final PersonAddress personAddress = new PersonAddress.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                        .addressTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ADDRESSTYPE)))
+                        .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                        .description(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)))
+                        .status(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
+                        .postalCode(cursor.getString(cursor.getColumnIndex(COLUMN_POSTALCODE)))
+                        .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
                         .build();
-                settings.add(setting);
+                personAddresses.add(personAddress);
             } while (cursor.moveToNext());
         }
-        return settings;
+        return personAddresses;
     }
 
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
     }
@@ -169,8 +183,7 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Set
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
-
     }
 }

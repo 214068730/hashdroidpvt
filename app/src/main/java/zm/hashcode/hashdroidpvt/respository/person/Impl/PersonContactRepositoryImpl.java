@@ -8,40 +8,38 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
-import zm.hashcode.hashdroidpvt.domain.settings.Settings;
-import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.conf.util.AppUtil;
+import zm.hashcode.hashdroidpvt.domain.person.PersonContact;
+import zm.hashcode.hashdroidpvt.respository.person.PersonContactRepository;
 
 /**
  * Created by hashcode on 2016/04/16.
  */
-public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements SettingsRepository {
-    public static final String TABLE_SETTINGS = "settings";
+public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements PersonContactRepository {
+    public static final String TABLE_NAME = "pcontacts";
     private SQLiteDatabase db;
 
-    private Long id;
-    private String contactTypeId;
-    private String contactValue;
-    private String status;
-    private Date date;
-    private String state;
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_CODE = "code";
-    public static final String COLUMN_USERNAME = "username";
-    public static final String COLUMN_PASSWORD = "passwd";
+    public static final String COLUMN_CONTACTTYPE = "contactTypeId";
+    public static final String COLUMN_CONTACTVALUE = "contactValue";
+    public static final String COLUMN_STATUS = "status";
+    public static final String COLUMN_DATE = "date";
+    public static final String COLUMN_STATE = "state";
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
-            + TABLE_SETTINGS + "("
+            + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
-            + COLUMN_CODE + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_USERNAME + " TEXT UNIQUE NOT NULL , "
-            + COLUMN_PASSWORD + " TEXT NOT NULL );";
+            + COLUMN_CONTACTTYPE + " TEXT UNIQUE NOT NULL , "
+            + COLUMN_CONTACTVALUE + " TEXT  NOT NULL , "
+            + COLUMN_STATUS + " TEXT  NOT NULL , "
+            + COLUMN_DATE + " TEXT  NOT NULL , "
+            + COLUMN_STATE + " TEXT NOT NULL );";
 
 
     public PersonContactRepositoryImpl(Context context) {
@@ -57,16 +55,18 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Set
     }
 
     @Override
-    public Settings findById(Long id) {
+    public PersonContact findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 new String[]{
                         COLUMN_ID,
-                        COLUMN_CODE,
-                        COLUMN_USERNAME,
-                        COLUMN_PASSWORD},
+                        COLUMN_CONTACTTYPE,
+                        COLUMN_CONTACTVALUE,
+                        COLUMN_STATUS,
+                        COLUMN_DATE,
+                        COLUMN_STATE},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -74,29 +74,33 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Set
                 null,
                 null);
         if (cursor.moveToFirst()) {
-            final Settings settings = new Settings.Builder()
+            final PersonContact personalAddress = new PersonContact.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                    .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                    .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                    .contactTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_CONTACTTYPE)))
+                    .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                    .status(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
+                    .contactValue(cursor.getString(cursor.getColumnIndex(COLUMN_CONTACTVALUE)))
+                    .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
                     .build();
 
-            return settings;
+            return personalAddress;
         } else {
             return null;
         }
     }
 
     @Override
-    public Settings save(Settings entity) {
+    public PersonContact save(PersonContact entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
-        long id = db.insertOrThrow(TABLE_SETTINGS, null, values);
-        Settings insertedEntity = new Settings.Builder()
+        values.put(COLUMN_CONTACTTYPE, entity.getContactTypeId());
+        values.put(COLUMN_DATE, entity.getDate().toString());
+        values.put(COLUMN_CONTACTVALUE, entity.getContactValue());
+        values.put(COLUMN_STATE, entity.getState());
+        values.put(COLUMN_STATUS, entity.getStatus());
+        long id = db.insertOrThrow(TABLE_NAME, null, values);
+        PersonContact insertedEntity = new PersonContact.Builder()
                 .copy(entity)
                 .id(new Long(id))
                 .build();
@@ -104,15 +108,17 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Set
     }
 
     @Override
-    public Settings update(Settings entity) {
+    public PersonContact update(PersonContact entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_CODE, entity.getCode());
-        values.put(COLUMN_USERNAME, entity.getUsername());
-        values.put(COLUMN_PASSWORD, entity.getPassword());
+        values.put(COLUMN_CONTACTTYPE, entity.getContactTypeId());
+        values.put(COLUMN_DATE, entity.getDate().toString());
+        values.put(COLUMN_CONTACTVALUE, entity.getContactValue());
+        values.put(COLUMN_STATE, entity.getState());
+        values.put(COLUMN_STATUS, entity.getStatus());
         db.update(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 values,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())}
@@ -121,39 +127,41 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Set
     }
 
     @Override
-    public Settings delete(Settings entity) {
+    public PersonContact delete(PersonContact entity) {
         open();
         db.delete(
-                TABLE_SETTINGS,
+                TABLE_NAME,
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(entity.getId())});
         return entity;
     }
 
     @Override
-    public Set<Settings> findAll() {
+    public Set<PersonContact> findAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Set<Settings> settings = new HashSet<>();
+        Set<PersonContact> personAddresses = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_SETTINGS, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
         if (cursor.moveToFirst()) {
             do {
-                final Settings setting = new Settings.Builder()
+                final PersonContact personAddress = new PersonContact.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .code(cursor.getString(cursor.getColumnIndex(COLUMN_CODE)))
-                        .username(cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME)))
-                        .password(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)))
+                        .contactTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_CONTACTTYPE)))
+                        .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                        .status(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
+                        .contactValue(cursor.getString(cursor.getColumnIndex(COLUMN_CONTACTVALUE)))
+                        .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
                         .build();
-                settings.add(setting);
+                personAddresses.add(personAddress);
             } while (cursor.moveToNext());
         }
-        return settings;
+        return personAddresses;
     }
 
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_SETTINGS,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
     }
@@ -168,8 +176,7 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Set
         Log.w(this.getClass().getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
-
     }
 }

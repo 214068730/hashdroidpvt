@@ -8,16 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
+import zm.hashcode.hashdroidpvt.conf.util.AppUtil;
 import zm.hashcode.hashdroidpvt.domain.election.PollingStation;
 import zm.hashcode.hashdroidpvt.respository.election.PollingStationRepository;
 
@@ -28,11 +23,6 @@ import zm.hashcode.hashdroidpvt.respository.election.PollingStationRepository;
 public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements PollingStationRepository {
     public static final String TABLE_NAME = "station";
     private SQLiteDatabase db;
-
-    private Long id;
-    private String name;
-    private int voters;
-    private Map<String, String> location;
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
@@ -82,7 +72,7 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Po
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
                     .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
                     .voters(cursor.getInt(cursor.getColumnIndex(COLUMN_VOTERS)))
-                    .location(getLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION))))
+                    .location(AppUtil.getLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION))))
                     .build();
 
             return PollingStation;
@@ -91,19 +81,14 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Po
         }
     }
 
-    private Map<String, String> getLocation(String value) {
-        final Gson gson = new Gson();
-        Type typeOfHashMap = new TypeToken<Map<String, String>>() {
-        }.getType();
-        return gson.fromJson(value, typeOfHashMap);
-    }
+
 
     @Override
     public PollingStation save(PollingStation entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_LOCATION, getStringLocation(entity.getLocation()));
+        values.put(COLUMN_LOCATION, AppUtil.getStringLocation(entity.getLocation()));
         values.put(COLUMN_NAME, entity.getName());
         values.put(COLUMN_VOTERS, entity.getVoters());
         long id = db.insertOrThrow(TABLE_NAME, null, values);
@@ -114,17 +99,14 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Po
         return insertedEntity;
     }
 
-    private String getStringLocation(Map<String, String> location) {
-        Gson gson = new Gson();
-        return gson.toJson(location);
-    }
+
 
     @Override
     public PollingStation update(PollingStation entity) {
         open();
         ContentValues values = new ContentValues();
         values.put(COLUMN_ID, entity.getId());
-        values.put(COLUMN_LOCATION, getStringLocation(entity.getLocation()));
+        values.put(COLUMN_LOCATION, AppUtil.getStringLocation(entity.getLocation()));
         values.put(COLUMN_NAME, entity.getName());
         values.put(COLUMN_VOTERS, entity.getVoters());
         db.update(
@@ -158,7 +140,7 @@ public class PollingStationRepositoryImpl extends SQLiteOpenHelper implements Po
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
                         .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
                         .voters(cursor.getInt(cursor.getColumnIndex(COLUMN_VOTERS)))
-                        .location(getLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION))))
+                        .location(AppUtil.getLocation(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION))))
                         .build();
                 pollingStations.add(pollingStation);
             } while (cursor.moveToNext());

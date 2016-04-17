@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class Gender implements Serializable {
 
-    private String id;
+    private Long id;
     private String name;
     private String state;
 
@@ -18,7 +18,7 @@ public class Gender implements Serializable {
         this.state = builder.state;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -31,11 +31,11 @@ public class Gender implements Serializable {
     }
 
     public static class Builder{
-        private String id;
+        private Long id;
         private String name;
         private String state;
 
-        public Builder id(String id) {
+        public Builder id(Long id) {
             this.id = id;
             return this;
         }

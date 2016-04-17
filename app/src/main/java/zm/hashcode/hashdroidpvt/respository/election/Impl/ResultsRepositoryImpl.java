@@ -8,18 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import zm.hashcode.hashdroidpvt.conf.databases.DBConstants;
+import zm.hashcode.hashdroidpvt.conf.util.AppUtil;
 import zm.hashcode.hashdroidpvt.domain.election.Results;
 import zm.hashcode.hashdroidpvt.respository.election.ResultsRepository;
 
@@ -29,15 +22,6 @@ import zm.hashcode.hashdroidpvt.respository.election.ResultsRepository;
 public class ResultsRepositoryImpl extends SQLiteOpenHelper implements ResultsRepository {
     public static final String TABLE_NAME = "results";
     private SQLiteDatabase db;
-
-    private Long id;
-    private Map<String,Integer> results;
-    private String location;
-    private String agent;
-    private Date date;
-    private String status;
-    private byte[] image;
-
 
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_RESULTS = "results";
@@ -94,9 +78,9 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements ResultsRe
         if (cursor.moveToFirst()) {
             final Results Results = new Results.Builder()
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                    .results(getValue(cursor.getString(cursor.getColumnIndex(COLUMN_RESULTS))))
+                    .results(AppUtil.getValue(cursor.getString(cursor.getColumnIndex(COLUMN_RESULTS))))
                     .agent(cursor.getString(cursor.getColumnIndex(COLUMN_AGENT)))
-                    .date(getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                    .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
                     .image(cursor.getBlob(cursor.getColumnIndex(COLUMN_IMAGE)))
                     .location(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION)))
                     .statusx(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
@@ -108,28 +92,7 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements ResultsRe
         }
     }
 
-    private Date getDate(String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-        Date value = null;
-        try {
-            value = formatter.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return value;
-    }
 
-    private Map<String, Integer> getValue(String value) {
-        final Gson gson = new Gson();
-        Type typeOfHashMap = new TypeToken<Map<String, Integer>>() {
-        }.getType();
-        return gson.fromJson(value, typeOfHashMap);
-    }
-
-    private String getStringValue(Map<String, Integer> value) {
-        Gson gson = new Gson();
-        return gson.toJson(value);
-    }
 
     @Override
     public Results save(Results entity) {
@@ -140,7 +103,7 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements ResultsRe
         values.put(COLUMN_DATE, entity.getDate().toString());
         values.put(COLUMN_IMAGE, entity.getImage());
         values.put(COLUMN_LOCATION, entity.getLocation());
-        values.put(COLUMN_RESULTS, getStringValue(entity.getResults()));
+        values.put(COLUMN_RESULTS, AppUtil.getStringValue(entity.getResults()));
         values.put(COLUMN_STATUS, entity.getStatus());
         long id = db.insertOrThrow(TABLE_NAME, null, values);
         Results insertedEntity = new Results.Builder()
@@ -160,7 +123,7 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements ResultsRe
         values.put(COLUMN_DATE, entity.getDate().toString());
         values.put(COLUMN_IMAGE, entity.getImage());
         values.put(COLUMN_LOCATION, entity.getLocation());
-        values.put(COLUMN_RESULTS, getStringValue(entity.getResults()));
+        values.put(COLUMN_RESULTS, AppUtil.getStringValue(entity.getResults()));
         values.put(COLUMN_STATUS, entity.getStatus());
         db.update(
                 TABLE_NAME,
@@ -191,9 +154,9 @@ public class ResultsRepositoryImpl extends SQLiteOpenHelper implements ResultsRe
             do {
                 final Results result = new Results.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
-                        .results(getValue(cursor.getString(cursor.getColumnIndex(COLUMN_RESULTS))))
+                        .results(AppUtil.getValue(cursor.getString(cursor.getColumnIndex(COLUMN_RESULTS))))
                         .agent(cursor.getString(cursor.getColumnIndex(COLUMN_AGENT)))
-                        .date(getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
+                        .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
                         .image(cursor.getBlob(cursor.getColumnIndex(COLUMN_IMAGE)))
                         .location(cursor.getString(cursor.getColumnIndex(COLUMN_LOCATION)))
                         .statusx(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))

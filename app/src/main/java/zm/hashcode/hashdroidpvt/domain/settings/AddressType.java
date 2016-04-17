@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class AddressType implements Serializable {
 
-    private String id;
+    private Long id;
     private String name;
     private String state;
 
@@ -19,7 +19,7 @@ public class AddressType implements Serializable {
         this.state = builder.state;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
@@ -32,11 +32,11 @@ public class AddressType implements Serializable {
     }
 
     public static class Builder{
-        private String id;
+        private Long id;
         private String name;
         private String state;
 
-        public Builder id(String id) {
+        public Builder id(Long id) {
             this.id = id;
             return this;
         }
