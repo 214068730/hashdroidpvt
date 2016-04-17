@@ -47,4 +47,8 @@ public class AppUtil {
         return gson.toJson(value);
     }
 
+    public static String getBaserURI(){
+        return "localhost";
+    }
+
 }
