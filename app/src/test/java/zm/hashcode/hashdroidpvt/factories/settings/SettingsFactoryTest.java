@@ -14,7 +14,6 @@ public class SettingsFactoryTest {
     public void testCreate() throws Exception {
         Settings settings = SettingsFactory.getSettings("test@test.com", "USEM", "hello");
         Assert.assertEquals("test@test.com",settings.getUsername());
-
     }
 
     @Test
