@@ -12,14 +12,14 @@ import zm.hashcode.hashdroidpvt.domain.settings.Settings;
 public class SettingsFactoryTest {
     @Test
     public void testCreate() throws Exception {
-        Settings settings = SettingsFactory.getSettings("test@test.com","USEM");
+        Settings settings = SettingsFactory.getSettings("test@test.com", "USEM", "hello");
         Assert.assertEquals("test@test.com",settings.getUsername());
 
     }
 
     @Test
     public void testUpdate() throws Exception {
-        Settings settings = SettingsFactory.getSettings("test@test.com","USEM");
+        Settings settings = SettingsFactory.getSettings("test@test.com", "USEM", "hello");
         Settings newSettings = new Settings
                 .Builder()
                 .copy(settings)

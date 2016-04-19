@@ -49,6 +49,20 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
     }
 
     @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(DATABASE_CREATE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.w(this.getClass().getName(),
+                "Upgrading database from version " + oldVersion + " to "
+                        + newVersion + ", which will destroy all old data");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        onCreate(db);
+    }
+
+    @Override
     public Settings findById(Long id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -148,20 +162,5 @@ public class SettingsRepositoryImpl extends SQLiteOpenHelper implements Settings
         int rowsDeleted = db.delete(TABLE_NAME,null,null);
         close();
         return rowsDeleted;
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        db.execSQL(DATABASE_CREATE);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(this.getClass().getName(),
-                "Upgrading database from version " + oldVersion + " to "
-                        + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        onCreate(db);
-
     }
 }
