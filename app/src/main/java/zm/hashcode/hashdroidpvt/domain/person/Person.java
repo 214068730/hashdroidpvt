@@ -11,6 +11,8 @@ public class Person implements Serializable {
     private String emailAddress;
     private String lastName;
     private String authvalue;
+    private String organisation;
+    private String token;
 
     private Person() {
 
@@ -36,12 +38,22 @@ public class Person implements Serializable {
         return firstName;
     }
 
+    public String getOrganisation() {
+        return organisation;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
     public Person(Builder builder) {
         this.id = builder.id;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.emailAddress = builder.emailAddress;
         this.authvalue = builder.authvalue;
+        this.organisation = builder.organisation;
+        this.token = builder.token;
     }
 
     public static class Builder {
@@ -50,9 +62,21 @@ public class Person implements Serializable {
         private String emailAddress;
         private String lastName;
         private String authvalue;
+        private String organisation;
+        private String token;
 
         public Builder id(Long value) {
             this.id = value;
+            return this;
+        }
+
+        public Builder organisation(String value) {
+            this.organisation = value;
+            return this;
+        }
+
+        public Builder token(String value) {
+            this.token = value;
             return this;
         }
 
@@ -83,6 +107,8 @@ public class Person implements Serializable {
             this.lastName = value.lastName;
             this.emailAddress = value.emailAddress;
             this.authvalue = value.authvalue;
+            this.organisation = value.organisation;
+            this.token = value.token;
             return this;
         }
 

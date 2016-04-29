@@ -48,7 +48,7 @@ public class AppUtil {
     }
 
     public static String getBaserURI(){
-        return "localhost";
+        return "http://10.0.0.8:9000/";
     }
 
 }

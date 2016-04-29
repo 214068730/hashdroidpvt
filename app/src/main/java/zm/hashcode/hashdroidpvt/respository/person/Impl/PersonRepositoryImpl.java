@@ -28,6 +28,8 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
     public static final String COLUMN_EMAILADDRESS = "emailAddress";
     public static final String COLUMN_LASTNAME = "lastName";
     public static final String COLUMN_AUTHVALUE = "authvalue";
+    public static final String COLUMN_ORGANISATION = "organisation";
+    public static final String COLUMN_TOKEN = "token";
 
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
@@ -36,7 +38,9 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
             + COLUMN_FIRSTNAME + " TEXT  NOT NULL , "
             + COLUMN_EMAILADDRESS + " TEXT UNIQUE NOT NULL , "
             + COLUMN_LASTNAME + " TEXT  NOT NULL , "
-            + COLUMN_AUTHVALUE + " TEXT NOT NULL );";
+            + COLUMN_AUTHVALUE + " TEXT NOT NULL,"
+            + COLUMN_ORGANISATION + " TEXT NOT NULL,"
+            + COLUMN_TOKEN + " TEXT NOT NULL  ) ";
 
 
     public PersonRepositoryImpl(Context context) {
@@ -62,7 +66,9 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
                         COLUMN_FIRSTNAME,
                         COLUMN_EMAILADDRESS,
                         COLUMN_LASTNAME,
-                        COLUMN_AUTHVALUE},
+                        COLUMN_AUTHVALUE,
+                        COLUMN_ORGANISATION,
+                        COLUMN_TOKEN},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -76,6 +82,8 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
                     .emailAddress(cursor.getString(cursor.getColumnIndex(COLUMN_EMAILADDRESS)))
                     .firstName(cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME)))
                     .lastName(cursor.getString(cursor.getColumnIndex(COLUMN_LASTNAME)))
+                    .organisation(cursor.getString(cursor.getColumnIndex(COLUMN_ORGANISATION)))
+                    .token(cursor.getString(cursor.getColumnIndex(COLUMN_TOKEN)))
                     .build();
             return Person;
         } else {
@@ -92,6 +100,8 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
         values.put(COLUMN_EMAILADDRESS, entity.getEmailAddress());
         values.put(COLUMN_FIRSTNAME, entity.getFirstName());
         values.put(COLUMN_LASTNAME, entity.getLastName());
+        values.put(COLUMN_ORGANISATION, entity.getOrganisation());
+        values.put(COLUMN_TOKEN, entity.getToken());
         long id = db.insertOrThrow(TABLE_NAME, null, values);
         Person insertedEntity = new Person.Builder()
                 .copy(entity)
@@ -109,6 +119,8 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
         values.put(COLUMN_EMAILADDRESS, entity.getEmailAddress());
         values.put(COLUMN_FIRSTNAME, entity.getFirstName());
         values.put(COLUMN_LASTNAME, entity.getLastName());
+        values.put(COLUMN_ORGANISATION, entity.getOrganisation());
+        values.put(COLUMN_TOKEN, entity.getToken());
         db.update(
                 TABLE_NAME,
                 values,
@@ -133,7 +145,7 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
         SQLiteDatabase db = this.getReadableDatabase();
         Set<Person> Person = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 final Person setting = new Person.Builder()
@@ -142,6 +154,8 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
                         .emailAddress(cursor.getString(cursor.getColumnIndex(COLUMN_EMAILADDRESS)))
                         .firstName(cursor.getString(cursor.getColumnIndex(COLUMN_FIRSTNAME)))
                         .lastName(cursor.getString(cursor.getColumnIndex(COLUMN_LASTNAME)))
+                        .organisation(cursor.getString(cursor.getColumnIndex(COLUMN_ORGANISATION)))
+                        .token(cursor.getString(cursor.getColumnIndex(COLUMN_TOKEN)))
                         .build();
                 Person.add(setting);
             } while (cursor.moveToNext());
@@ -152,7 +166,7 @@ public class PersonRepositoryImpl extends SQLiteOpenHelper implements PersonRepo
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_NAME,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME, null, null);
         close();
         return rowsDeleted;
     }

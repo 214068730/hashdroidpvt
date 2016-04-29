@@ -53,8 +53,9 @@ public class ActivateServiceImpl extends Service implements ActivateService {
     }
 
     @Override
-    public void deactivateAccount() {
-        // CAll Intent Services
+    public boolean deactivateAccount() {
+        int rows = repo.deleteAll();
+        return rows > 0;
 
     }
 

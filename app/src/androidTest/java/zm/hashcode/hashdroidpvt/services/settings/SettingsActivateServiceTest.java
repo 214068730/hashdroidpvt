@@ -44,11 +44,25 @@ public class SettingsActivateServiceTest extends AndroidTestCase {
         }
     };
 
-    public void testCreateReadUpdateDelete() throws Exception {
+    public void testActivateAccount() throws Exception {
         String activate = activateService.activateAccount("bonifae@test.com", "HASH", "test");
         Assert.assertEquals("ACTIVATED", activate);
 
     }
+
+    public void testIsAccountActivated() throws Exception {
+        Boolean activated = activateService.isAccountActivated();
+        Assert.assertTrue("ACTIVATED", activated);
+
+    }
+
+    public void testDeactivateAccount() throws Exception {
+        Boolean deactivated = activateService.deactivateAccount();
+        Assert.assertTrue("ACTIVATED", deactivated);
+
+    }
+
+
 
 
 }

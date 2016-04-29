@@ -44,7 +44,7 @@ public class App extends Application {
 
     public RequestQueue getRequestQueue() {
         if (requestQueue == null) {
-            requestQueue = Volley.newRequestQueue(getApplicationContext(),new HashHttpStack());
+            requestQueue = Volley.newRequestQueue(getApplicationContext());
         }
 
         return requestQueue;

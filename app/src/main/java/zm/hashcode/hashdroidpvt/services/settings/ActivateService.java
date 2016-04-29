@@ -8,5 +8,5 @@ public interface ActivateService {
 
     boolean isAccountActivated();
 
-    void deactivateAccount();
+    boolean deactivateAccount();
 }
