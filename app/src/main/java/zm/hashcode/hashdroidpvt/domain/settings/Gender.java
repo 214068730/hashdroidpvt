@@ -10,12 +10,18 @@ public class Gender implements Serializable {
     private Long id;
     private String name;
     private String state;
+    private String serverId;
 
     private Gender(){}
+
+    public String getServerId() {
+        return serverId;
+    }
     public  Gender(Builder builder) {
         this.id = builder.id;
         this.name = builder.name;
         this.state = builder.state;
+        this.serverId = builder.serverId;
     }
 
     public Long getId() {
@@ -34,6 +40,12 @@ public class Gender implements Serializable {
         private Long id;
         private String name;
         private String state;
+        private String serverId;
+
+        public Builder serverId(String id) {
+            this.serverId = id;
+            return this;
+        }
 
         public Builder id(Long id) {
             this.id = id;
@@ -53,6 +65,7 @@ public class Gender implements Serializable {
             this.id = gender.id;
             this.name = gender.name;
             this.state = gender.state;
+            this.serverId = gender.serverId;
 
             return this;
         }

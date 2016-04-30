@@ -24,10 +24,10 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
     private SQLiteDatabase db;
 
 
-
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_STATE = "state";
+    public static final String COLUMN_SERVERID = "serverid";
 
 
     // Database creation sql statement
@@ -35,7 +35,8 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
             + TABLE_NAME + "("
             + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_NAME + " TEXT  NOT NULL , "
-            + COLUMN_STATE + " TEXT NOT NULL );";
+            + COLUMN_STATE + " TEXT NOT NULL, "
+            + COLUMN_SERVERID + " TEXT NOT NULL );";
 
 
     public AddressTypeRepositoryImpl(Context context) {
@@ -59,7 +60,8 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
                 new String[]{
                         COLUMN_ID,
                         COLUMN_NAME,
-                        COLUMN_STATE},
+                        COLUMN_STATE,
+                        COLUMN_SERVERID},
                 COLUMN_ID + " =? ",
                 new String[]{String.valueOf(id)},
                 null,
@@ -71,6 +73,7 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
                     .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
                     .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
                     .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
+                    .serverId(cursor.getString(cursor.getColumnIndex(COLUMN_SERVERID)))
                     .build();
 
             return AddressType;
@@ -86,6 +89,7 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
         values.put(COLUMN_ID, entity.getId());
         values.put(COLUMN_NAME, entity.getName());
         values.put(COLUMN_STATE, entity.getName());
+        values.put(COLUMN_SERVERID, entity.getServerId());
         long id = db.insertOrThrow(TABLE_NAME, null, values);
         AddressType insertedEntity = new AddressType.Builder()
                 .copy(entity)
@@ -101,6 +105,7 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
         values.put(COLUMN_ID, entity.getId());
         values.put(COLUMN_NAME, entity.getName());
         values.put(COLUMN_STATE, entity.getState());
+        values.put(COLUMN_SERVERID, entity.getServerId());
         db.update(
                 TABLE_NAME,
                 values,
@@ -125,13 +130,14 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
         SQLiteDatabase db = this.getReadableDatabase();
         Set<AddressType> addressTypes = new HashSet<>();
         open();
-        Cursor cursor = db.query(TABLE_NAME, null,null,null,null,null,null);
+        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 final AddressType addressType = new AddressType.Builder()
                         .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
                         .name(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)))
                         .state(cursor.getString(cursor.getColumnIndex(COLUMN_STATE)))
+                        .serverId(cursor.getString(cursor.getColumnIndex(COLUMN_SERVERID)))
                         .build();
                 addressTypes.add(addressType);
             } while (cursor.moveToNext());
@@ -142,7 +148,7 @@ public class AddressTypeRepositoryImpl extends SQLiteOpenHelper implements Addre
     @Override
     public int deleteAll() {
         open();
-        int rowsDeleted = db.delete(TABLE_NAME,null,null);
+        int rowsDeleted = db.delete(TABLE_NAME, null, null);
         close();
         return rowsDeleted;
     }

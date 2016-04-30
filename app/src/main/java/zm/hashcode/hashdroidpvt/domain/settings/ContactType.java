@@ -10,13 +10,19 @@ public class ContactType implements Serializable{
     private Long id;
     private String name;
     private String state;
+    private String serverId;
 
     private ContactType(){}
+
+    public String getServerId() {
+        return serverId;
+    }
 
     public ContactType(Builder builder) {
         this.id = builder.id;
         this.name = builder.name;
         this.state = builder.state;
+        this.serverId = builder.serverId;
     }
 
     public Long getId() {
@@ -35,6 +41,12 @@ public class ContactType implements Serializable{
         private Long id;
         private String name;
         private String state;
+        private String serverId;
+
+        public Builder serverId(String id) {
+            this.serverId = id;
+            return this;
+        }
 
         public Builder id(Long id) {
             this.id = id;
@@ -55,6 +67,7 @@ public class ContactType implements Serializable{
             this.id = contactType.id;
             this.name = contactType.name;
             this.state = contactType.state;
+            this.serverId = contactType.serverId;
             return this;
         }
 

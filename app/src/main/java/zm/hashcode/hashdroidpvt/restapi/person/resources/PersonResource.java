@@ -10,7 +10,12 @@ public class PersonResource implements Serializable {
     private String emailAddress;
     private String lastName;
     private String authvalue;
+    private String organisation;
     private String token;
+
+    public String getOrganisation() {
+        return organisation;
+    }
 
     public String getToken() {
         return token;
@@ -38,6 +43,7 @@ public class PersonResource implements Serializable {
         this.authvalue = builder.authvalue;
         this.emailAddress = builder.emailAddress;
         this.token = builder.token;
+        this.organisation = builder.organisation;
     }
 
     public static class Builder {
@@ -46,6 +52,12 @@ public class PersonResource implements Serializable {
         private String lastName;
         private String authvalue;
         private String token;
+        private String organisation;
+
+        public Builder organisation(String value) {
+            this.organisation = value;
+            return this;
+        }
 
         public Builder firstName(String value) {
             this.firstName = value;

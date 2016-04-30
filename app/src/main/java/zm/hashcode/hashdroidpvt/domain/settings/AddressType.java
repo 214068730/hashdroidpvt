@@ -10,6 +10,7 @@ public class AddressType implements Serializable {
     private Long id;
     private String name;
     private String state;
+    private String serverId;
 
     private AddressType(){}
 
@@ -17,6 +18,11 @@ public class AddressType implements Serializable {
         this.id = builder.id;
         this.name = builder.name;
         this.state = builder.state;
+        this.serverId = builder.serverId;
+    }
+
+    public String getServerId() {
+        return serverId;
     }
 
     public Long getId() {
@@ -35,6 +41,12 @@ public class AddressType implements Serializable {
         private Long id;
         private String name;
         private String state;
+        private String serverId;
+
+        public Builder serverId(String id) {
+            this.serverId = id;
+            return this;
+        }
 
         public Builder id(Long id) {
             this.id = id;
@@ -55,6 +67,7 @@ public class AddressType implements Serializable {
             this.id = addressType.id;
             this.name = addressType.name;
             this.state = addressType.state;
+            this.serverId = addressType.serverId;
 
             return this;
         }
