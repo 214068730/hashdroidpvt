@@ -36,8 +36,6 @@ public class App extends Application {
             .getSimpleName();
 
 
-
-
     public static synchronized App getInstance() {
         return singleton;
     }

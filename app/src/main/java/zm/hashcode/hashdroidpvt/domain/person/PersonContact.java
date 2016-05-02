@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by hashcode on 2016/04/09.
  */
 public class PersonContact implements Serializable {
-    private Long id;
+    private String id;
     private String contactTypeId;
     private String contactValue;
     private String status;
@@ -15,7 +15,7 @@ public class PersonContact implements Serializable {
     private String state;
     private PersonContact(){}
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -49,14 +49,14 @@ public class PersonContact implements Serializable {
     }
 
     public static class Builder{
-        private Long id;
+        private String id;
         private String contactTypeId;
         private String contactValue;
         private String status;
         private Date date;
         private String state;
 
-        public Builder id(Long value){
+        public Builder id(String value) {
             this.id =value;
             return this;
         }

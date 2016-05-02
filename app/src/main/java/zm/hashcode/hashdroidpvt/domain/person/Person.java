@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class Person implements Serializable {
     private Long id;
+    private String serverId;
     private String firstName;
     private String emailAddress;
     private String lastName;
@@ -14,8 +15,13 @@ public class Person implements Serializable {
     private String organisation;
     private String token;
 
+
     private Person() {
 
+    }
+
+    public String getServerId() {
+        return serverId;
     }
 
     public Long getId() {
@@ -54,10 +60,12 @@ public class Person implements Serializable {
         this.authvalue = builder.authvalue;
         this.organisation = builder.organisation;
         this.token = builder.token;
+        this.serverId = builder.serverId;
     }
 
     public static class Builder {
         private Long id;
+        private String serverId;
         private String firstName;
         private String emailAddress;
         private String lastName;
@@ -72,6 +80,11 @@ public class Person implements Serializable {
 
         public Builder organisation(String value) {
             this.organisation = value;
+            return this;
+        }
+
+        public Builder serverId(String value) {
+            this.serverId = value;
             return this;
         }
 
@@ -109,6 +122,7 @@ public class Person implements Serializable {
             this.authvalue = value.authvalue;
             this.organisation = value.organisation;
             this.token = value.token;
+            this.serverId = value.serverId;
             return this;
         }
 

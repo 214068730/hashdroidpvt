@@ -35,7 +35,7 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Per
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
             + TABLE_NAME + "("
-            + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_ID + " TEXT  PRIMARY KEY , "
             + COLUMN_DESCRIPTION + " TEXT NOT NULL , "
             + COLUMN_POSTALCODE + " TEXT NOT NULL , "
             + COLUMN_ADDRESSTYPE + " TEXT  NOT NULL , "
@@ -78,7 +78,7 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Per
                 null);
         if (cursor.moveToFirst()) {
             final PersonAddress personalAddress = new PersonAddress.Builder()
-                    .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
+                    .id(cursor.getString(cursor.getColumnIndex(COLUMN_ID)))
                     .addressTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ADDRESSTYPE)))
                     .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
                     .description(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)))
@@ -104,12 +104,8 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Per
         values.put(COLUMN_POSTALCODE, entity.getPostalCode());
         values.put(COLUMN_STATE, entity.getState());
         values.put(COLUMN_STATUS, entity.getStatus());
-        long id = db.insertOrThrow(TABLE_NAME, null, values);
-        PersonAddress insertedEntity = new PersonAddress.Builder()
-                .copy(entity)
-                .id(new Long(id))
-                .build();
-        return insertedEntity;
+        db.insertOrThrow(TABLE_NAME, null, values);
+        return entity;
     }
 
     @Override
@@ -151,7 +147,7 @@ public class PersonAddressRepositoryImpl extends SQLiteOpenHelper implements Per
         if (cursor.moveToFirst()) {
             do {
                 final PersonAddress personAddress = new PersonAddress.Builder()
-                        .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
+                        .id(cursor.getString(cursor.getColumnIndex(COLUMN_ID)))
                         .addressTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_ADDRESSTYPE)))
                         .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
                         .description(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)))

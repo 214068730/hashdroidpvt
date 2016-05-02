@@ -5,11 +5,11 @@ import java.io.Serializable;
 /**
  * Created by hashcode on 2016/04/29.
  */
-public class ElectionResource implements Serializable {
+public class ElectionsResource implements Serializable {
     private String electionTypeId;
     private String name;
 
-    private ElectionResource() {
+    private ElectionsResource() {
     }
 
     public String getElectionTypeId() {
@@ -20,7 +20,7 @@ public class ElectionResource implements Serializable {
         return name;
     }
 
-    public ElectionResource(Builder builder) {
+    public ElectionsResource(Builder builder) {
         this.electionTypeId = builder.electionTypeId;
         this.name = builder.name;
     }
@@ -46,14 +46,14 @@ public class ElectionResource implements Serializable {
             return this;
         }
 
-        public Builder copy(ElectionResource value) {
+        public Builder copy(ElectionsResource value) {
             this.electionTypeId = value.electionTypeId;
             this.name = value.name;
             return this;
         }
 
-        public ElectionResource build() {
-            return new ElectionResource(this);
+        public ElectionsResource build() {
+            return new ElectionsResource(this);
         }
 
     }

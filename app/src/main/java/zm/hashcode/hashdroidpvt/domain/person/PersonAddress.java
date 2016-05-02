@@ -7,7 +7,7 @@ import java.util.Date;
  * Created by hashcode on 2016/04/09.
  */
 public class PersonAddress implements Serializable {
-    private Long id;
+    private String id;
     private String description;
     private String postalCode;
     private String addressTypeId;
@@ -17,7 +17,7 @@ public class PersonAddress implements Serializable {
 
     private PersonAddress(){}
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
@@ -56,7 +56,7 @@ public class PersonAddress implements Serializable {
     }
 
     public static class Builder{
-        private Long id;
+        private String id;
         private String description;
         private String postalCode;
         private String addressTypeId;
@@ -64,7 +64,7 @@ public class PersonAddress implements Serializable {
         private Date date;
         private String state;
 
-        public Builder id(Long value){
+        public Builder id(String value) {
             this.id =value;
             return this;
         }

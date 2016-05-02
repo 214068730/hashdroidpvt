@@ -34,7 +34,7 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Per
     // Database creation sql statement
     private static final String DATABASE_CREATE = " CREATE TABLE "
             + TABLE_NAME + "("
-            + COLUMN_ID + " INTEGER  PRIMARY KEY AUTOINCREMENT, "
+            + COLUMN_ID + " TEXT  PRIMARY KEY , "
             + COLUMN_CONTACTTYPE + " TEXT UNIQUE NOT NULL , "
             + COLUMN_CONTACTVALUE + " TEXT  NOT NULL , "
             + COLUMN_STATUS + " TEXT  NOT NULL , "
@@ -75,7 +75,7 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Per
                 null);
         if (cursor.moveToFirst()) {
             final PersonContact personalAddress = new PersonContact.Builder()
-                    .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
+                    .id(cursor.getString(cursor.getColumnIndex(COLUMN_ID)))
                     .contactTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_CONTACTTYPE)))
                     .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
                     .status(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))
@@ -100,11 +100,7 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Per
         values.put(COLUMN_STATE, entity.getState());
         values.put(COLUMN_STATUS, entity.getStatus());
         long id = db.insertOrThrow(TABLE_NAME, null, values);
-        PersonContact insertedEntity = new PersonContact.Builder()
-                .copy(entity)
-                .id(new Long(id))
-                .build();
-        return insertedEntity;
+        return entity;
     }
 
     @Override
@@ -145,7 +141,7 @@ public class PersonContactRepositoryImpl extends SQLiteOpenHelper implements Per
         if (cursor.moveToFirst()) {
             do {
                 final PersonContact personAddress = new PersonContact.Builder()
-                        .id(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)))
+                        .id(cursor.getString(cursor.getColumnIndex(COLUMN_ID)))
                         .contactTypeId(cursor.getString(cursor.getColumnIndex(COLUMN_CONTACTTYPE)))
                         .date(AppUtil.getDate(cursor.getString(cursor.getColumnIndex(COLUMN_DATE))))
                         .status(cursor.getString(cursor.getColumnIndex(COLUMN_STATUS)))

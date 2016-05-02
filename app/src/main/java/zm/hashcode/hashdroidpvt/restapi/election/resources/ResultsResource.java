@@ -17,8 +17,6 @@ public class ResultsResource implements Serializable {
 
     private ResultsResource() {
     }
-
-
     public Map<String, String> getImages() {
         return images;
     }

@@ -9,6 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+
 /**
  * Created by hashcode on 2016/04/17.
  */
@@ -49,6 +52,14 @@ public class AppUtil {
 
     public static String getBaserURI(){
         return "http://10.0.0.8:9000/";
+    }
+
+    public static OkHttpClient getConnection() {
+        return new OkHttpClient();
+    }
+
+    public static MediaType getJSONMediaType() {
+        return MediaType.parse("application/json; charset=utf-8");
     }
 
 }

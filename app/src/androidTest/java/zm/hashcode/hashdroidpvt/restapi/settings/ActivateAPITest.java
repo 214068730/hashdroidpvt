@@ -7,7 +7,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import zm.hashcode.hashdroidpvt.domain.person.Person;
 import zm.hashcode.hashdroidpvt.restapi.settings.api.ActivateAPI;
-import zm.hashcode.hashdroidpvt.restapi.settings.api.Impl.ActivateAPImpl;
+import zm.hashcode.hashdroidpvt.restapi.settings.api.Impl.ActivateAPIImpl;
 
 /**
  * Created by hashcode on 2016/04/28.
@@ -19,11 +19,11 @@ public class ActivateAPITest extends AndroidTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        api = new ActivateAPImpl();
+        api = new ActivateAPIImpl();
 
     }
 
-    public void testActivateAccount() {
+    public void testActivateAccount() throws Exception {
         Person person = api.activateAccount("admin@test.com", "admin");
         Assert.assertTrue(BCrypt.checkpw("admin", person.getAuthvalue()));
     }

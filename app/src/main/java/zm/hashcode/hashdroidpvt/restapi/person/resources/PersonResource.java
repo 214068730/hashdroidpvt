@@ -6,12 +6,17 @@ import java.io.Serializable;
  * Created by hashcode on 2016/04/24.
  */
 public class PersonResource implements Serializable {
+    private String serverId;
     private String firstName;
     private String emailAddress;
     private String lastName;
     private String authvalue;
     private String organisation;
     private String token;
+
+    public String getServerId() {
+        return serverId;
+    }
 
     public String getOrganisation() {
         return organisation;
@@ -38,6 +43,7 @@ public class PersonResource implements Serializable {
     }
 
     public PersonResource(Builder builder) {
+        this.serverId = builder.serverId;
         this.firstName = builder.firstName;
         this.lastName = builder.lastName;
         this.authvalue = builder.authvalue;
@@ -47,12 +53,18 @@ public class PersonResource implements Serializable {
     }
 
     public static class Builder {
+        private String serverId;
         private String firstName;
         private String emailAddress;
         private String lastName;
         private String authvalue;
         private String token;
         private String organisation;
+
+        public Builder serverId(String value) {
+            this.serverId = value;
+            return this;
+        }
 
         public Builder organisation(String value) {
             this.organisation = value;

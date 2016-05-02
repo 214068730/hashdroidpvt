@@ -82,12 +82,12 @@ public class AddressType implements Serializable {
 
         AddressType that = (AddressType) o;
 
-        return id != null ? id.equals(that.id) : that.id == null;
+        return serverId != null ? serverId.equals(that.serverId) : that.serverId == null;
 
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return serverId != null ? serverId.hashCode() : 0;
     }
 }
