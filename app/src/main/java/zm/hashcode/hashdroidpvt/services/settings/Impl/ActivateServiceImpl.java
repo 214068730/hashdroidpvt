@@ -12,23 +12,37 @@ import zm.hashcode.hashdroidpvt.conf.util.DomainState;
 import zm.hashcode.hashdroidpvt.domain.person.Person;
 import zm.hashcode.hashdroidpvt.domain.settings.Settings;
 import zm.hashcode.hashdroidpvt.factories.settings.SettingsFactory;
+import zm.hashcode.hashdroidpvt.respository.person.Impl.PersonRepositoryImpl;
 import zm.hashcode.hashdroidpvt.respository.person.PersonRepository;
 import zm.hashcode.hashdroidpvt.respository.settings.Impl.SettingsRepositoryImpl;
 import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
 import zm.hashcode.hashdroidpvt.restapi.settings.api.ActivateAPI;
 import zm.hashcode.hashdroidpvt.restapi.settings.api.Impl.ActivateAPIImpl;
 import zm.hashcode.hashdroidpvt.services.settings.ActivateService;
+import zm.hashcode.hashdroidpvt.services.settings.GetMetaDataService;
 
 // This is a Bound Local Service
 public class ActivateServiceImpl extends Service implements ActivateService {
-    private PersonRepository personRepository;
-    private SettingsRepository settingsRepository;
+    final private PersonRepository personRepository;
+    final private SettingsRepository settingsRepository;
+    final private GetMetaDataService getMetaDataService;
+
+    private static ActivateServiceImpl service = null;
+
+    public static ActivateServiceImpl getInstance() {
+        if (service == null)
+            service = new ActivateServiceImpl();
+        return service;
+    }
 
     private final IBinder localBinder = new ActivateServiceLocalBinder();
 
     private SettingsRepository repo;
 
-    public ActivateServiceImpl() {
+    private ActivateServiceImpl() {
+        personRepository = new PersonRepositoryImpl(App.getAppContext());
+        settingsRepository = new SettingsRepositoryImpl(App.getAppContext());
+        getMetaDataService = GetMetaDataServiceImpl.getInstance();
     }
 
     @Override
@@ -56,8 +70,7 @@ public class ActivateServiceImpl extends Service implements ActivateService {
                 Person savedPerson = personRepository.save(person);
                 if (savedSettings.getId() != null && savedPerson.getId() != null) {
                     state = DomainState.ACTIVATED.name();
-
-
+                    getMetaDataService.getMetaData(App.getAppContext());
                 }
             }
 
