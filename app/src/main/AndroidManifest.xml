@@ -34,6 +34,12 @@
             android:exported="false" />
         <service
             android:name=".services.settings.Impl.GetMetaDataServiceImpl"
+            android:exported="false" />
+        <service
+            android:name=".services.person.Impl.PersonAddressServiceImpl"
+            android:exported="false" />
+        <service
+            android:name=".services.person.Impl.PersonContactServiceImpl"
             android:exported="false"></service>
     </application>
 
