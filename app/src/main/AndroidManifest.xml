@@ -23,16 +23,18 @@
             android:label="Go back to Login" />
 
         <service
-            android:name=".services.settings.Impl.ActivateIntentService"
-            android:exported="false" />
-        <service
-            android:name=".services.settings.Impl.ActivateStubService"
+            android:name=".services.settings.Impl.ActivateServiceImpl"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".services.settings.Impl.ActivateServiceImpl"
-            android:enabled="true"
-            android:exported="true"></service>
+            android:name=".services.settings.Impl.AppResetServiceImpl"
+            android:exported="false" />
+        <service
+            android:name=".services.settings.Impl.MetaDataUpdateServiceImpl"
+            android:exported="false" />
+        <service
+            android:name=".services.settings.Impl.GetMetaDataServiceImpl"
+            android:exported="false"></service>
     </application>
 
 </manifest>

@@ -5,16 +5,24 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
+import java.io.IOException;
+
 import zm.hashcode.hashdroidpvt.conf.util.App;
 import zm.hashcode.hashdroidpvt.conf.util.DomainState;
+import zm.hashcode.hashdroidpvt.domain.person.Person;
 import zm.hashcode.hashdroidpvt.domain.settings.Settings;
 import zm.hashcode.hashdroidpvt.factories.settings.SettingsFactory;
+import zm.hashcode.hashdroidpvt.respository.person.PersonRepository;
 import zm.hashcode.hashdroidpvt.respository.settings.Impl.SettingsRepositoryImpl;
 import zm.hashcode.hashdroidpvt.respository.settings.SettingsRepository;
+import zm.hashcode.hashdroidpvt.restapi.settings.api.ActivateAPI;
+import zm.hashcode.hashdroidpvt.restapi.settings.api.Impl.ActivateAPIImpl;
 import zm.hashcode.hashdroidpvt.services.settings.ActivateService;
 
 // This is a Bound Local Service
 public class ActivateServiceImpl extends Service implements ActivateService {
+    private PersonRepository personRepository;
+    private SettingsRepository settingsRepository;
 
     private final IBinder localBinder = new ActivateServiceLocalBinder();
 
@@ -37,19 +45,32 @@ public class ActivateServiceImpl extends Service implements ActivateService {
 
 
     @Override
-    public String activateAccount(String email, String code, String password) {
-        if (true) {
-            Settings settings = SettingsFactory.getSettings(email, code, password);
-//            createSettings(settings);
-            return DomainState.ACTIVATED.name();
-        } else {
-            return DomainState.NOTACTIVATED.name();
+    public String activateAccount(String email, String password) {
+        String state = DomainState.NOTACTIVATED.name();
+        ActivateAPI api = new ActivateAPIImpl();
+        try {
+            Person person = api.activateAccount(email, password);
+            if (person.getToken() != "NONE") {
+                Settings settings = SettingsFactory.getSettings(email, person.getOrganisation(), person.getToken());
+                Settings savedSettings = settingsRepository.save(settings);
+                Person savedPerson = personRepository.save(person);
+                if (savedSettings.getId() != null && savedPerson.getId() != null) {
+                    state = DomainState.ACTIVATED.name();
+
+
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return state;
+
     }
 
     @Override
     public boolean isAccountActivated() {
-        return repo.findAll().size()>0;
+        return repo.findAll().size() > 0;
     }
 
     @Override

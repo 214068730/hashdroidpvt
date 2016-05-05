@@ -45,7 +45,7 @@ public class SettingsActivateServiceTest extends AndroidTestCase {
     };
 
     public void testActivateAccount() throws Exception {
-        String activate = activateService.activateAccount("bonifae@test.com", "HASH", "test");
+        String activate = activateService.activateAccount("bonifae@test.com", "test");
         Assert.assertEquals("ACTIVATED", activate);
 
     }
