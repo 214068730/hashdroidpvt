@@ -62,4 +62,8 @@ public class AppUtil {
         return MediaType.parse("application/json; charset=utf-8");
     }
 
+    public static byte[] getImage(String imageUrl) {
+        return null;
+    }
+
 }

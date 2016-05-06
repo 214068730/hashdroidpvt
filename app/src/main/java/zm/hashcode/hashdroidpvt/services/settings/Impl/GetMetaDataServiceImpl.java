@@ -81,7 +81,7 @@ public class GetMetaDataServiceImpl extends IntentService implements GetMetaData
 
     private void handleContacts(Set<ContactTypeResource> contactTypes) {
         for (ContactTypeResource contactType : contactTypes) {
-            metaDataUpdateService.addContactTYpes(App.getAppContext(), contactType);
+            metaDataUpdateService.addContactTypes(App.getAppContext(), contactType);
         }
 
     }

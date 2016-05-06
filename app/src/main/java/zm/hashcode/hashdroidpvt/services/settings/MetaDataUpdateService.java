@@ -10,7 +10,7 @@ import zm.hashcode.hashdroidpvt.restapi.settings.resources.GenderResource;
  * Created by hashcode on 2016/05/05.
  */
 public interface MetaDataUpdateService {
-    void addContactTYpes(Context context, ContactTypeResource contactTypeResources);
+    void addContactTypes(Context context, ContactTypeResource contactTypeResources);
 
     void addAddressTypes(Context context, AddressTypeResource addressTypeResources);
 

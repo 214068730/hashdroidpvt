@@ -52,19 +52,21 @@ public class AppResetServiceImpl extends IntentService implements AppResetServic
     private static final String ACTION_POLLINGSTATION = "zm.hashcode.hashdroidpvt.services.settings.action.POLLINGSTATION";
     private static final String ACTION_METARESET = "zm.hashcode.hashdroidpvt.services.settings.action.METARESET";
 
-
+    @Override
     public void startActionSettings(Context context) {
         Intent intent = new Intent(context, AppResetServiceImpl.class);
         intent.setAction(ACTION_SETTINGS);
         context.startService(intent);
     }
 
+    @Override
     public void startActionPollingStation(Context context) {
         Intent intent = new Intent(context, AppResetServiceImpl.class);
         intent.setAction(ACTION_POLLINGSTATION);
         context.startService(intent);
     }
 
+    @Override
     public void startActionMetaReset(Context context) {
         Intent intent = new Intent(context, AppResetServiceImpl.class);
         intent.setAction(ACTION_METARESET);

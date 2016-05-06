@@ -54,7 +54,7 @@ public class MetaDataUpdateServiceImpl extends IntentService implements MetaData
 
 
     @Override
-    public void addContactTYpes(Context context, ContactTypeResource contactTypeResource) {
+    public void addContactTypes(Context context, ContactTypeResource contactTypeResource) {
         Intent intent = new Intent(context, MetaDataUpdateServiceImpl.class);
         intent.setAction(ACTION_CONTACT);
         intent.putExtra(EXTRA_CONTACT, contactTypeResource);
