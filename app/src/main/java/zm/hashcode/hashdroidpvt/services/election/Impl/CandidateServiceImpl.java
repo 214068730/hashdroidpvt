@@ -12,13 +12,7 @@ import zm.hashcode.hashdroidpvt.respository.election.Impl.CandidateRepositoryImp
 import zm.hashcode.hashdroidpvt.restapi.election.resources.CandidateResourse;
 import zm.hashcode.hashdroidpvt.services.election.CandidateService;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
+
 public class CandidateServiceImpl extends IntentService implements CandidateService {
     private final CandidateRepository repository;
 

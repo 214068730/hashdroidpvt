@@ -11,13 +11,7 @@ import zm.hashcode.hashdroidpvt.respository.election.Impl.ElectionsRepositoryImp
 import zm.hashcode.hashdroidpvt.restapi.election.resources.ElectionsResource;
 import zm.hashcode.hashdroidpvt.services.election.ElectionsTypeService;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
+
 public class ElectionsTypeServiceImpl extends IntentService implements ElectionsTypeService {
     private final ElectionsRepository repository;
 
@@ -30,7 +24,6 @@ public class ElectionsTypeServiceImpl extends IntentService implements Elections
     }
 
 
-    // TODO: Rename parameters
     private static final String EXTRA_ADD = "zm.hashcode.hashdroidpvt.services.election.Impl.extra.ADD";
 
 

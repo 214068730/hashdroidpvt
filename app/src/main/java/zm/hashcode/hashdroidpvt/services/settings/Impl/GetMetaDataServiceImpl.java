@@ -21,12 +21,6 @@ import zm.hashcode.hashdroidpvt.services.settings.GetMetaDataService;
 import zm.hashcode.hashdroidpvt.services.settings.MetaDataUpdateService;
 
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions and extra parameters.
- */
 public class GetMetaDataServiceImpl extends IntentService implements GetMetaDataService {
     private final GenderAPI genderApi;
     private final ContactTypeAPI contactTypeAPI;

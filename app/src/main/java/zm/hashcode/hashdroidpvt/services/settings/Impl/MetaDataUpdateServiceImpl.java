@@ -19,13 +19,7 @@ import zm.hashcode.hashdroidpvt.restapi.settings.resources.ContactTypeResource;
 import zm.hashcode.hashdroidpvt.restapi.settings.resources.GenderResource;
 import zm.hashcode.hashdroidpvt.services.settings.MetaDataUpdateService;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
+
 public class MetaDataUpdateServiceImpl extends IntentService implements MetaDataUpdateService {
     private GenderRepository genderRepository;
     private ContactTypeRespository contactTypeRespository;

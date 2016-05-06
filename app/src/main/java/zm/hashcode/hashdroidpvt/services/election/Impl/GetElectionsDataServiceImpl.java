@@ -87,8 +87,8 @@ public class GetElectionsDataServiceImpl extends IntentService implements GetEle
 
     }
 
-    private void addCandidates(Set<CandidateResourse> candidateResourses) {
-        for (CandidateResourse candidateResourse : candidateResourses) {
+    private void addCandidates(Set<CandidateResourse> candidateResources) {
+        for (CandidateResourse candidateResourse : candidateResources) {
             candidateService.addCandidate(App.getAppContext(), candidateResourse);
         }
     }
