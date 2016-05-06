@@ -3,6 +3,9 @@ package zm.hashcode.hashdroidpvt.conf.util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,6 +14,8 @@ import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by hashcode on 2016/04/17.
@@ -63,7 +68,27 @@ public class AppUtil {
     }
 
     public static byte[] getImage(String imageUrl) {
-        return null;
+        byte[] data = null;
+        Request request = new Request.Builder().url(imageUrl)
+                .build();
+        try {
+            Response response = getConnection().newCall(request).execute();
+            InputStream input = response.body().byteStream();
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            while ((bytesRead = input.read(buffer)) != -1) {
+                output.write(buffer, 0, bytesRead);
+            }
+            output.flush();
+            output.close();
+            input.close();
+            data = output.toByteArray();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
 }
